@@ -3,6 +3,14 @@ const crypto = require('crypto'); // For generating email update token
 const nodemailer = require('nodemailer'); // For sending emails
 
 // Email update request route
+/**
+ * Handles the request to update the user's email address.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the email update process is complete.
+ * @throws {Error} - If there is a server error.
+ */
 const requestEmailUpdate = async (req, res) => {
   try {
     const { userId, newEmail } = req.body;
