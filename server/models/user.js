@@ -24,41 +24,42 @@ const userSchema = new mongoose.Schema({
     unique: true, // Ensures unique email addresses
     match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address.'],
     // Examples and other validations can be added here
-    isActivated: true
   },
   password: {
     type: String,
     required: true,
     minlength: [6, 'Password should be at least 6 characters.'],
     // Remember to implement secure password hashing!
-    isActivated: true
   },
   role: {
     type: String,
     enum: ['standard_user', 'admin'],
     default: 'standard_user',
     // Examples and other validations can be added here
-    isActivated: true
   },
   created_at: {
     type: Date,
     default: Date.now,
-    isActivated: true
   },
   updated_at: {
     type: Date,
     default: Date.now,
-    isActivated: true
   },
   isAdmin: {
     type: Boolean,
     default: false,
-    isActivated: true
   },
   profile: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'profile',
-    isActivated: true
+  },
+  isActivated: {
+    type: Boolean,
+    default: true,
+  },
+  emailVerificationToken: {
+    type: String,
+    default: null,
   },
 }, {
   additionalProperties: true,
@@ -69,7 +70,8 @@ const userSchema = new mongoose.Schema({
     "role",
     "created_at",
     "updated_at",
-    "isAdmin"
+    "isAdmin",
+    "profile"
   ],
 });
 
