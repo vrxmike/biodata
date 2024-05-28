@@ -6,7 +6,6 @@
  * @requires ../models/profile
  * @requires bcrypt
  * @requires ./profileController
- * @requires ../middlewares/inputValidator
  * @requires nodemailer
  * @requires crypto
  */
@@ -27,7 +26,7 @@ const crypto = require('crypto');
  * @param {Object} res - The response object.
  * @returns {Promise<void>} A promise that resolves when the registration is successful or rejects with an error.
  */
-exports.registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -95,7 +94,7 @@ exports.registerUser = async (req, res) => {
  * @param {Object} res - The response object.
  * @returns {Promise<void>} A promise that resolves when the email is verified successfully or rejects with an error.
  */
-exports.verifyEmail = async (req, res) => {
+const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
 
@@ -117,13 +116,48 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
+const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Generate a new verification token
+    const emailVerificationToken = crypto.randomBytes(20).toString("hex");
+
+    // Save the token in user document
+    user.emailVerificationToken = emailVerificationToken;
+    await user.save();
+
+    // Send verification email
+    const transporter = nodemailer.createTransport({  /* your SMTP settings */});
+    const mailOptions = {
+      to: user.email,
+      from: "no-reply@example.com",
+      subject: "Email Verification",
+      text: `Please verify your email address by clicking on the following link: http://${req.headers.host}/verify-email?token=${emailVerificationToken}`,
+    };
+    await transporter.sendMail(mailOptions);
+
+    // Send success response
+    res.status(200).json({ message: "Verification email sent!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 /**
  * Retrieves a user and their profile.
  * @param {Object} req - The request object.
  * @param {Object} res - The response object.
  * @returns {Promise<void>} A promise that resolves with the user and profile data or rejects with an error.
  */
-exports.getUserAndProfile = async (req, res) => {
+const getUserAndProfile = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -156,11 +190,11 @@ exports.getUserAndProfile = async (req, res) => {
 
 /**
  * Deletes a user and their profile.
- * @param {Object} req - The request object.
+ * @paraam {Object} req - The request object.
  * @param {Object} res - The response object.
  * @returns {Promise<void>} A promise that resolves when the user and profile are deleted successfully or rejects with an error.
  */
-exports.deleteUserAndProfile = async (req, res) => {
+const deleteUserAndProfile = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -194,4 +228,4 @@ exports.deleteUserAndProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, getUserAndProfile, deleteUserAndProfile, verifyEmail };
+module.exports = { registerUser, getUserAndProfile, deleteUserAndProfile, verifyEmail, resendVerificationEmail };
