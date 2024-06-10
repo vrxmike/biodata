@@ -5,7 +5,6 @@
  * @throws {Error} If there is an error connecting to the database.
  */
 require('dotenv').config({ path: './config.env' });
-const { MongoClient } = require("mongodb");
 const mongoose = require("mongoose");
 const { ATLAS_URI } = process.env;
 
@@ -18,10 +17,7 @@ const { ATLAS_URI } = process.env;
  */
 const connectToServer = async function () {
   try {
-    await mongoose.connect(ATLAS_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(ATLAS_URI);
     console.log("Connected to database");
   } catch (error) {
     console.error("Error connecting to database:", error);
