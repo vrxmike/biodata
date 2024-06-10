@@ -11,7 +11,7 @@
     ```
 2. Navigate to the project directory:
     ```bash
-    cd project-name
+    cd server
     ```
 3. Install dependencies:
     ```bash
