@@ -25,10 +25,11 @@ const mongoose = require('mongoose');
  * @property {string} user_role - The role of the user.
  */
 const profileSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
+  _id:{ type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId() },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User' // Reference to the User model
+    ref: 'User', // Reference to the User model
+    required: true // This make user field required
   },
   personal_info: {
     type: {
@@ -80,7 +81,7 @@ const profileSchema = new mongoose.Schema({
   },
   affiliations: {
     type: {
-      other_muslim_organizations: { type: Boolean, isActivated: true },
+      other_muslim_organizations: { type: String, isActivated: true },
       capacity_in_organizations: { type: String, isActivated: true },
     },
     additionalProperties: true,
@@ -97,7 +98,7 @@ const profileSchema = new mongoose.Schema({
   languages: {
     type: String,
     isActivated: true,
-    examples: ['English, Kiswahili, Arabic'],
+    examples: ['English', 'Kiswahili', 'Arabic'],
   },
   religious_service: {
     type: {
@@ -139,13 +140,13 @@ const profileSchema = new mongoose.Schema({
   },
   documents: {
     type: {
-      'C.V': { type: mongoose.Schema.Types.ObjectId, isActivated: true },
-      idcard: { type: mongoose.Schema.Types.ObjectId, isActivated: true },
-      passport: { type: mongoose.Schema.Types.ObjectId, isActivated: true },
-      profile_picture: { type: mongoose.Schema.Types.ObjectId, isActivated: true },
+      CV: { type: String, isActivated: true },
+      idcard: { type: String, isActivated: true },
+      passport: { type: String, isActivated: true },
+      profile_picture: { type: String, isActivated: true },
     },
     additionalProperties: true,
-    required: ['C.V', 'idcard', 'passport', 'profile_picture' ],
+    required: ['CV', 'idcard', 'passport', 'profile_picture' ],
   },
   application_status: {
     type: String,
