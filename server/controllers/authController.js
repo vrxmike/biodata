@@ -126,7 +126,14 @@ const requestPasswordReset = async (req, res) => {
     await user.save();
 
     // Send password reset email
-    const transporter = nodemailer.createTransport({ /* your SMTP settings */ });
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAILTRAP_HOST,
+      port: process.env.MAILTRAP_PORT,
+      auth: {
+        user: process.env.MAILTRAP_USER,
+        pass: process.env.MAILTRAP_PASS
+      }
+    });
     const mailOptions = {
       to: user.email,
       from: 'passwordreset@example.com',
