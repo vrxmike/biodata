@@ -31,7 +31,7 @@ router.post('/register', registrationController.registerUser);
  */
 router.get('/verify-email', registrationController.verifyEmail);
 
-router.post('/resend-verification', resendVerificationEmail);
+router.post('/resend-verification', registrationController.resendVerificationEmail);
 /**
  * Route for getting a user and their profile.
  * @name GET /user/:userId
