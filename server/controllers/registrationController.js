@@ -16,7 +16,6 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const Profile = require('../models/profile');
 const bcrypt = require('bcrypt'); // For password hashing
-const profileController = require('./profileController'); // Adjust path as needed
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
@@ -29,14 +28,12 @@ const crypto = require('crypto');
 const registerUser = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
+
   try {
     // 1. Extract and validate user data
-    const { email, password, role } = req.body;
+    const { email, password, role, personal_info, voter_info, affiliations, education, languages, religious_service, employment, health_info, emergency_contact_info, signature, documents, application_status, admin_notes, admin_approval_date, admin_rejection_date, application_progress, user_role } = req.body;
+
     // Validate role
-    /**
-     * Array of allowed roles.
-     * @type {string[]}
-     */
     const allowedRoles = ["standard_user", "admin"];
     if (role && !allowedRoles.includes(role)) {
       return res.status(400).json({ message: "Invalid role" });
@@ -50,11 +47,37 @@ const registerUser = async (req, res) => {
 
     // 3. Create user document with hashed password
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ email, password: hashedPassword, role });
+    const user = new User({
+      _id: new mongoose.Types.ObjectId(),
+      email,
+      password: hashedPassword,
+      role
+    });
     await user.save({ session });
 
-    // 4. Delegate profile creation to profileController
-    await profileController.createProfile(user._id, req.body, session);
+    // 4. Create profile document
+    const profile = new Profile({
+      _id: new mongoose.Types.ObjectId(),
+      user: user._id,
+      personal_info,
+      voter_info,
+      affiliations,
+      education,
+      languages,
+      religious_service,
+      employment,
+      health_info,
+      emergency_contact_info,
+      signature,
+      documents,
+      application_status,
+      admin_notes,
+      admin_approval_date,
+      admin_rejection_date,
+      application_progress,
+      user_role
+    });
+    await profile.save({ session });
 
     // 5. Send confirmation email (if applicable)
     const emailVerificationToken = crypto.randomBytes(20).toString("hex");
@@ -64,7 +87,16 @@ const registerUser = async (req, res) => {
     await user.save({ session });
 
     // Send verification email
-    const transporter = nodemailer.createTransport({  /* your SMTP settings */});
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAILTRAP_HOST,
+      port: process.env.MAILTRAP_PORT,
+      auth: {
+        user: process.env.MAILTRAP_USER,
+        pass: process.env.MAILTRAP_PASS
+      }
+    });
+
+    // Define mail options
     const mailOptions = {
       to: user.email,
       from: "no-reply@example.com",
@@ -78,13 +110,13 @@ const registerUser = async (req, res) => {
     session.endSession();
 
     // 7. Send success response
-    res.status(201).json({ message: "Registration successful!" });
+    res.status(201).json({ message: "Registration successful!", user, profile });
   } catch (error) {
     console.error(error);
     await session.abortTransaction();
     session.endSession();
     const errorMessage = error.message || 'Error during registration';
-    res.status(500).json({ message: errorMessage }); // Provide more specific error messages
+    res.status(500).json({ message: errorMessage });
   }
 };
 
