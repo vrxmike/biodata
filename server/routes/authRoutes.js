@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const authMiddleware = require('../middlewares/authMiddleware');
 /**
  * Controller for handling authentication related operations.
  * @type {Object}
@@ -29,7 +29,7 @@ router.post('/login', authController.login);
  * @param {Object} res - The response object.
  * @param {Function} next - The next middleware function.
  */
-router.post('/logout', authController.logout);
+router.post('/logout', authMiddleware, authController.logout);
 
 /**
  * Route for refreshing user token.
