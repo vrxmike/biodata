@@ -1,3 +1,4 @@
+require('dotenv').config({ path: './config.env' });
 const bcrypt = require('bcrypt'); // For password hashing
 const jwt = require('jsonwebtoken'); // For JWT generation and verification
 const User = require('../models/user'); // Import User model
