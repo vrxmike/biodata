@@ -65,6 +65,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  emailUpdateToken: {
+    type: String,
+    default: null,
+  },
+  newEmail: {
+    type: String,
+    match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address.'],
+    default: null,
+  },
   passwordResetToken: {
     type: String,
     default: null,
