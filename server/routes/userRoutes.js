@@ -6,6 +6,7 @@ const router = express.Router();
  * @type {Object}
  */
 const userController = require('../controllers/userController');
+const { authMiddleware } = require('../middlewares/authMiddleware');
 
 /**
  * Route for handling the request to update the user's email.
@@ -17,7 +18,7 @@ const userController = require('../controllers/userController');
  * @param {Object} res - The response object.
  * @returns {void}
  */
-router.post('/request-email-update', userController.requestEmailUpdate);
+router.post('/request-email-update', authMiddleware, userController.requestEmailUpdate);
 
 /**
  * Route for handling the verification of the email update request.
@@ -29,6 +30,6 @@ router.post('/request-email-update', userController.requestEmailUpdate);
  * @param {Object} res - The response object.
  * @returns {void}
  */
-router.get('/verify-email-update/:token', userController.verifyEmailUpdate);
+router.get('/verify-email-update/:token', authMiddleware, userController.verifyEmailUpdate);
 
 module.exports = router;
