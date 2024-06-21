@@ -1,3 +1,4 @@
+require('dotenv').config({ path: './config.env' });
 const User = require('../models/user'); // Relative path to user model
 const crypto = require('crypto'); // For generating email update token
 const nodemailer = require('nodemailer'); // For sending emails
@@ -30,7 +31,16 @@ const requestEmailUpdate = async (req, res) => {
     await user.save();
 
     // Send verification email to new email address
-    const transporter = nodemailer.createTransport({ /* your SMTP settings */ });
+    const transporter = nodemailer.createTransport({
+      host: process.env.MAILTRAP_HOST,
+      post: process.env.MAILTRAP_PORT,
+      auth: {
+        user: process.env.MAILTRAP_USER,
+        pass: process.env.MAILTRAP_PASS
+      }
+    });
+
+    // Define mail options
     const mailOptions = {
       to: newEmail,
       from: 'emailupdate@example.com',
